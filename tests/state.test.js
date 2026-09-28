@@ -8,6 +8,7 @@ import {
   deleteReport,
   summarizeReport,
   shouldReset,
+  applyMessage,
 } from '../background/state.js';
 
 test('getReport cria um PageReport vazio na primeira chamada', () => {
@@ -52,4 +53,58 @@ test('summarizeReport converte Sets em contagens e listas', () => {
 test('shouldReset é true só para navegação do frame principal', () => {
   assert.equal(shouldReset({ frameId: 0 }), true);
   assert.equal(shouldReset({ frameId: 5 }), false);
+});
+
+test('resetReport aceita overrides para carregar sinais pendentes de antes do reset', () => {
+  const fresh = resetReport(5, { bounceTrackingDetected: true });
+  assert.equal(fresh.bounceTrackingDetected, true);
+  assert.equal(fresh.thirdPartyDomains.size, 0);
+});
+
+test('resetReport sem overrides continua produzindo report vazio', () => {
+  const fresh = resetReport(6);
+  assert.equal(fresh.bounceTrackingDetected, false);
+});
+
+test('applyMessage seta injectionFailed', () => {
+  const report = createEmptyReport();
+  applyMessage(report, { type: 'injection-failed' });
+  assert.equal(report.injectionFailed, true);
+});
+
+test('applyMessage adiciona storage-write só com origin string não vazia', () => {
+  const report = createEmptyReport();
+  applyMessage(report, { type: 'storage-write', origin: 'tracker.net' });
+  applyMessage(report, { type: 'storage-write', origin: '' });
+  applyMessage(report, { type: 'storage-write' });
+  assert.deepEqual([...report.thirdPartyStorageOrigins], ['tracker.net']);
+});
+
+test('applyMessage marca canvas fingerprint por 1ª/3ª parte', () => {
+  const report = createEmptyReport();
+  applyMessage(report, { type: 'canvas-fingerprint', thirdParty: true });
+  assert.equal(report.canvasFingerprint.thirdParty, true);
+  assert.equal(report.canvasFingerprint.firstParty, false);
+});
+
+test('applyMessage trunca detail de window-tamper em 64 caracteres', () => {
+  const report = createEmptyReport();
+  const longDetail = 'x'.repeat(100);
+  applyMessage(report, { type: 'window-tamper', detail: longDetail });
+  const [entry] = [...report.hijackIndicators];
+  assert.equal(entry.length, 'window-tamper:'.length + 64);
+});
+
+test('applyMessage usa "unknown" quando detail não é string', () => {
+  const report = createEmptyReport();
+  applyMessage(report, { type: 'window-tamper', detail: { evil: true } });
+  assert.equal([...report.hijackIndicators][0], 'window-tamper:unknown');
+});
+
+test('applyMessage limita hijackIndicators a 20 entradas (proteção contra spam)', () => {
+  const report = createEmptyReport();
+  for (let i = 0; i < 25; i++) {
+    applyMessage(report, { type: 'window-tamper', detail: `key${i}` });
+  }
+  assert.equal(report.hijackIndicators.size, 20);
 });

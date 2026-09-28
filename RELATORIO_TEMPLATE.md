@@ -39,9 +39,9 @@ Para cada site:
 |---|---|---|---|---|
 | | | | | |
 
-Metodologia de score: ver `docs/superpowers/specs/2026-09-28-privacy-tracker-extension-design.md`
-(seção "Metodologia de score") — copiar a tabela de critérios/pesos para o
-PDF final entregue, já que a spec não é commitada neste repositório.
+Metodologia de score: ver `README.md` (seção "Metodologia de pontuação de
+privacidade") — copiar a tabela de critérios/pesos para o PDF final
+entregue.
 
 Divergências esperadas vs. Blacklight (documentar concretamente por site):
 Blacklight detecta categorias que este plugin não implementa (session

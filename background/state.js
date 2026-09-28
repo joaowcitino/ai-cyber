@@ -21,8 +21,8 @@ export function getReport(tabId) {
   return reports.get(tabId);
 }
 
-export function resetReport(tabId) {
-  const fresh = createEmptyReport();
+export function resetReport(tabId, overrides = {}) {
+  const fresh = { ...createEmptyReport(), ...overrides };
   reports.set(tabId, fresh);
   return fresh;
 }
@@ -50,4 +50,32 @@ export function summarizeReport(report) {
 // client-side até o próximo reload completo (decisão documentada no spec).
 export function shouldReset(details) {
   return details.frameId === 0;
+}
+
+const HIJACK_INDICATOR_CAP = 20;
+const MAX_DETAIL_LENGTH = 64;
+
+function sanitizeDetail(detail) {
+  return typeof detail === 'string' ? detail.slice(0, MAX_DETAIL_LENGTH) : 'unknown';
+}
+
+// Único ponto que aplica sinais vindos de mensagens (content script/página
+// injetada) ao PageReport — mensagens de página são dado não confiável
+// (qualquer script da própria página pode forjar type/detail via
+// postMessage), então valida e limita aqui em vez de confiar cegamente.
+export function applyMessage(report, message) {
+  if (message.type === 'injection-failed') {
+    report.injectionFailed = true;
+  }
+  if (message.type === 'storage-write' && typeof message.origin === 'string' && message.origin.length > 0) {
+    report.thirdPartyStorageOrigins.add(message.origin.slice(0, MAX_DETAIL_LENGTH));
+  }
+  if (message.type === 'canvas-fingerprint') {
+    if (message.thirdParty) report.canvasFingerprint.thirdParty = true;
+    else report.canvasFingerprint.firstParty = true;
+  }
+  if (message.type === 'window-tamper' && report.hijackIndicators.size < HIJACK_INDICATOR_CAP) {
+    report.hijackIndicators.add(`window-tamper:${sanitizeDetail(message.detail)}`);
+  }
+  return report;
 }
