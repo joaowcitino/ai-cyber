@@ -2,10 +2,12 @@
 import { getReport, resetReport, deleteReport, shouldReset } from './state.js';
 import { registerTrackerListener } from './trackers.js';
 import { registerCookieListener } from './cookies.js';
+import { registerHijackListener } from './hijack-network.js';
 
 function registerAll() {
   registerTrackerListener(getReport);
   registerCookieListener(getReport);
+  registerHijackListener(getReport);
 }
 
 browser.webNavigation.onCommitted.addListener((details) => {

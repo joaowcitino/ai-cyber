@@ -23,4 +23,14 @@
     send('canvas-fingerprint');
     return originalToBlob.apply(this, args);
   };
+
+  const knownGlobals = new Set(Object.keys(window));
+  setTimeout(() => {
+    for (const key of Object.keys(window)) {
+      if (!knownGlobals.has(key)) {
+        send('window-tamper', key);
+        break;
+      }
+    }
+  }, 2000);
 })();
