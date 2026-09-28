@@ -5,12 +5,14 @@ import { registerCookieListener } from './cookies.js';
 import { registerHijackListener } from './hijack-network.js';
 import { registerBounceListener } from './bounce.js';
 import { computeScore, scoreBand } from './scoring.js';
+import { registerBlocklistListener } from './blocklist.js';
 
 function registerAll() {
   registerTrackerListener(getReport);
   registerCookieListener(getReport);
   registerHijackListener(getReport);
   registerBounceListener(getReport);
+  registerBlocklistListener();
 }
 
 browser.webNavigation.onCommitted.addListener((details) => {

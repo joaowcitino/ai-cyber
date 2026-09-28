@@ -6,7 +6,7 @@
   "browser_specific_settings": {
     "gecko": { "id": "privacy-tracker-detector@insper-cyber.local" }
   },
-  "permissions": ["webNavigation", "webRequest", "cookies", "tabs", "storage", "<all_urls>"],
+  "permissions": ["webNavigation", "webRequest", "webRequestBlocking", "cookies", "tabs", "storage", "<all_urls>"],
   "background": {
     "scripts": ["background/background.js"],
     "type": "module"
