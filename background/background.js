@@ -19,3 +19,21 @@ browser.tabs.onRemoved.addListener((tabId) => {
 });
 
 registerAll();
+
+browser.runtime.onMessage.addListener((message, sender) => {
+  if (!sender.tab) return;
+  const report = getReport(sender.tab.id);
+  if (message.type === 'injection-failed') {
+    report.injectionFailed = true;
+  }
+  if (message.type === 'storage-write') {
+    report.thirdPartyStorageOrigins.add(message.origin);
+  }
+  if (message.type === 'canvas-fingerprint') {
+    if (message.thirdParty) report.canvasFingerprint.thirdParty = true;
+    else report.canvasFingerprint.firstParty = true;
+  }
+  if (message.type === 'window-tamper') {
+    report.hijackIndicators.add(`window-tamper:${message.detail}`);
+  }
+});
