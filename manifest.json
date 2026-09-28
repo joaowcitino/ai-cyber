@@ -1,0 +1,14 @@
+{
+  "manifest_version": 2,
+  "name": "Privacy Tracker Detector",
+  "version": "1.0.0",
+  "description": "Detecta rastreadores, cookies, fingerprinting e indicadores de hijacking em páginas web.",
+  "browser_specific_settings": {
+    "gecko": { "id": "privacy-tracker-detector@insper-cyber.local" }
+  },
+  "permissions": ["webNavigation"],
+  "background": {
+    "scripts": ["background/background.js"],
+    "type": "module"
+  }
+}
