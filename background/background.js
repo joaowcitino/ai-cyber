@@ -1,8 +1,9 @@
 // background/background.js
 import { getReport, resetReport, deleteReport, shouldReset } from './state.js';
+import { registerTrackerListener } from './trackers.js';
 
 function registerAll() {
-  // tasks seguintes adicionam chamadas register*() aqui
+  registerTrackerListener(getReport);
 }
 
 browser.webNavigation.onCommitted.addListener((details) => {
