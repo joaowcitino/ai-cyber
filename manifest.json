@@ -23,5 +23,9 @@
   "options_ui": {
     "page": "ui/options.html",
     "open_in_tab": true
+  },
+  "browser_action": {
+    "default_popup": "ui/popup.html",
+    "default_title": "Privacy Tracker Detector"
   }
 }

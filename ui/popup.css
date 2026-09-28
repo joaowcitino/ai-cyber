@@ -1,0 +1,17 @@
+body {
+  width: 320px;
+  font-family: sans-serif;
+  padding: 8px;
+}
+.warning {
+  color: #b00020;
+  font-size: 0.85em;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+td {
+  padding: 4px 6px;
+  border-bottom: 1px solid #ddd;
+}
